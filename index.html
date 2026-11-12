@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abandoned but not Forgotten</title>
+<style>
+*{box-sizing:border-box}
+:root{--gold:#d8b45a;--moon:#9fb4d8;--mars:#e08a5a;--ink:#eceae4;--dim:#8b93a6;--line:#1d2130;--panel:#0d101a}
+html,body{margin:0;height:100%}
+body{background:#05060b;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  background-image:radial-gradient(1px 1px at 20% 30%,#fff6,transparent),radial-gradient(1px 1px at 70% 20%,#fff4,transparent),radial-gradient(1px 1px at 40% 70%,#fff5,transparent),radial-gradient(1px 1px at 85% 60%,#fff3,transparent),radial-gradient(1px 1px at 10% 80%,#fff4,transparent),radial-gradient(1200px 700px at 50% -10%,#141a2e,transparent);
+  background-attachment:fixed}
+.wrap{max-width:1000px;margin:0 auto;padding:40px 20px 70px}
+header{text-align:center;margin-bottom:26px}
+h1{font-size:clamp(26px,5vw,40px);margin:0 0 6px;letter-spacing:.01em;text-wrap:balance}
+.sub{color:var(--dim);margin:0 auto;max-width:600px;font-size:15px;line-height:1.5}
+.bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:22px 0 6px}
+button{font:inherit;font-size:14px;padding:8px 16px;border:1px solid var(--line);background:#0c0f18;color:var(--ink);border-radius:999px;cursor:pointer}
+button.on{background:var(--gold);border-color:var(--gold);color:#140f02;font-weight:600}
+.lang{position:absolute;top:16px;right:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:20px}
+.card{text-align:left;padding:18px;border:1px solid var(--line);background:var(--panel);border-radius:12px;cursor:pointer;transition:border-color .15s,transform .15s;display:flex;flex-direction:column;gap:8px;min-height:140px}
+.card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
+.m-moon .dot{background:var(--moon);box-shadow:0 0 10px var(--moon)}
+.m-mars .dot{background:var(--mars);box-shadow:0 0 10px var(--mars)}
+.card h3{margin:0;font-size:17px;line-height:1.25}
+.card .meta{color:var(--dim);font-size:12px}
+.card .peek{color:var(--gold);font-size:13px;font-style:italic;margin-top:auto}
+.top{display:flex;align-items:center;gap:8px}
+.thumb{width:100%;height:120px;object-fit:cover;border-radius:8px;background:#0a0d16;display:block}
+.m-img{width:100%;border-radius:10px;margin:4px 0 16px;display:none}
+.ord{display:flex;gap:6px;margin-top:10px}
+.ord button{flex:1;background:#1a2133;border:1px solid #2a3350;color:#fff;border-radius:6px;padding:7px;cursor:pointer;font-size:15px}
+.ord button:hover{background:#28324c}
+.card.edit{cursor:default}
+/* modal */
+.overlay{position:fixed;inset:0;background:#02030799;backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.overlay.open{display:flex}
+.modal{max-width:560px;width:100%;background:#0e1220;border:1px solid var(--line);border-radius:16px;padding:26px 24px;position:relative;max-height:88vh;overflow:auto}
+.modal .cat{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:600}
+.m-moon .cat,.cat.moon{color:var(--moon)}.m-mars .cat,.cat.mars{color:var(--mars)}
+.modal h2{margin:6px 0 2px;font-size:24px}
+.modal .meta{color:var(--dim);font-size:13px;margin-bottom:16px}
+.modal p{font-size:16px;line-height:1.6;margin:0 0 14px}
+.modal .hook{color:var(--gold);font-style:italic;font-size:16px;border-left:2px solid var(--gold);padding-left:12px}
+.close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--dim);font-size:26px;cursor:pointer;padding:0;line-height:1}
+.note{margin-top:34px;border:1px solid #352a12;background:#14110a;border-radius:10px;padding:14px 16px;font-size:13px;color:#d4c492;line-height:1.5}
+.foot{text-align:center;color:var(--dim);font-size:12px;margin-top:22px;line-height:1.6}
+</style>
+</head>
+<body>
+<button class="lang" id="lang" aria-label="language">ES</button>
+<div class="wrap">
+  <header>
+    <h1 id="title">Abandoned but not Forgotten</h1>
+    <p class="sub" id="sub">Every human machine left on the Moon and Mars has a story. Touch one to hear it.</p>
+    <div class="bar" id="filters"></div>
+  </header>
+  <div class="grid" id="grid"></div>
+  <div class="note" id="note"></div>
+  <p class="foot" id="foot"></p>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <button class="close" id="close" aria-label="close">×</button>
+    <img class="m-img" id="m-img" alt="">
+    <div class="cat" id="m-cat"></div>
+    <h2 id="m-title"></h2>
+    <div class="meta" id="m-meta"></div>
+    <p id="m-body"></p>
+    <p class="hook" id="m-hook"></p>
+  </div>
+</div>
+
+<script>
+const UI={
+  en:{title:"Abandoned but not Forgotten",sub:"Every human machine left on the Moon and Mars has a story. Touch one to hear it.",
+    all:"All",moon:"Moon",mars:"Mars",lang:"ES",
+    note:"Honesty note: every fact here is real and checkable. The famous Opportunity line — “my battery is low and it’s getting dark” — is a journalist’s poetic version, not a real transmission. It’s marked as such. Judges reward the truth.",
+    foot:"NASA Space Apps Challenge 2026 · Challenge: Abandoned but not Forgotten · by Re1, Basel · Data & images: NASA/JPL (public domain)"},
+  es:{title:"Abandonados pero no olvidados",sub:"Cada máquina humana dejada en la Luna y Marte tiene una historia. Toca una para oírla.",
+    all:"Todo",moon:"Luna",mars:"Marte",lang:"EN",
+    note:"Nota de honestidad: todos los datos son reales y comprobables. La famosa frase de Opportunity — “mi batería está baja y oscurece” — es una versión poética de la prensa, no un mensaje real. Está marcada así. Al jurado le gusta la verdad.",
+    foot:"NASA Space Apps Challenge 2026 · Reto: Abandoned but not Forgotten · por Re1, Basilea · Datos e imágenes: NASA/JPL (dominio público)"}
+};
+const DATA=[
+ {cat:"moon",en:{t:"The Fallen Astronaut",m:"Apollo 15 · 1971 · Mare Imbrium",b:"An 8.5 cm aluminium figure lying in the dust, beside a plaque with the names of 14 astronauts and cosmonauts who had died by then. Left by the artist Paul Van Hoeydonck through the crew.",h:"The only artwork on the Moon."},
+  es:{t:"El Astronauta Caído",m:"Apolo 15 · 1971 · Mare Imbrium",b:"Una figurita de aluminio de 8,5 cm tumbada en el polvo, junto a una placa con los nombres de 14 astronautas y cosmonautas muertos hasta esa fecha. La dejó el artista Paul Van Hoeydonck a través de la tripulación.",h:"La única obra de arte en la Luna."}},
+ {cat:"moon",en:{t:"Charlie Duke's family photo",m:"Apollo 16 · 1972 · Descartes",b:"Astronaut Charles Duke left a photo of his wife and two sons on the ground. On the back he wrote: “This is the family of astronaut Duke from planet Earth. Landed on the Moon, April 1972.”",h:"Still there, sun-bleached, half a century on."},
+  es:{t:"La foto de familia de Charlie Duke",m:"Apolo 16 · 1972 · Descartes",b:"El astronauta Charles Duke dejó en el suelo una foto de su mujer y sus dos hijos. Detrás escribió: “Esta es la familia del astronauta Duke, del planeta Tierra. Aterrizó en la Luna en abril de 1972.”",h:"Sigue ahí, descolorida por el sol, medio siglo después."}},
+ {cat:"moon",en:{t:"The flags",m:"Apollo 11–17 · 1969–1972",b:"Six flags were planted. Apollo 11's was knocked over by the engine at liftoff; the other five still stand, confirmed by LRO orbital images. But solar radiation has almost certainly bleached them white.",h:"Still standing — but with no colour left."},
+  es:{t:"Las banderas",m:"Apolo 11–17 · 1969–1972",b:"Se plantaron 6 banderas. La del Apolo 11 la tumbó el motor al despegar; las otras 5 siguen de pie, lo confirman las fotos de la sonda LRO. Pero la radiación del sol casi seguro las ha vuelto blancas.",h:"Siguen en pie, pero ya no tienen color."}},
+ {cat:"moon",en:{t:"The mirrors still in use",m:"Apollo 11, 14, 15 · 1969–1971",b:"Panels of mirrors (retroreflectors) left on the surface. From Earth a laser is fired at them and the echo is timed, measuring the Earth–Moon distance to the millimetre.",h:"Abandoned 50+ years ago, still working every night."},
+  es:{t:"Los espejos que aún se usan",m:"Apolo 11, 14, 15 · 1969–1971",b:"Paneles de espejos (retrorreflectores) dejados en la superficie. Desde la Tierra se les dispara un láser y se mide el rebote: así se sabe la distancia Tierra–Luna al milímetro.",h:"Abandonados hace más de 50 años y todavía funcionando cada noche."}},
+ {cat:"moon",en:{t:"Three Moon cars",m:"Apollo 15, 16, 17 · 1971–1972",b:"Three electric rovers (Lunar Roving Vehicles) parked exactly where the astronauts left them, ready for a trip that never came back.",h:"Three cars parked forever."},
+  es:{t:"Los tres coches lunares",m:"Apolo 15, 16, 17 · 1971–1972",b:"Tres vehículos eléctricos quedaron aparcados donde los dejaron los astronautas, listos para un viaje que nunca volvió.",h:"Tres coches aparcados para siempre."}},
+ {cat:"moon",en:{t:"Two golf balls",m:"Apollo 14 · 1971 · Fra Mauro",b:"Alan Shepard smuggled up a golf club head and hit two balls one-armed in his stiff suit. The second, he said, flew “miles and miles.” They are still somewhere in the dust.",h:"The only golf balls off Earth."},
+  es:{t:"Las dos pelotas de golf",m:"Apolo 14 · 1971 · Fra Mauro",b:"Alan Shepard subió a escondidas una cabeza de palo de golf y golpeó dos pelotas con un solo brazo por el traje rígido. La segunda, dijo, voló “millas y millas”. Siguen en algún lugar del polvo.",h:"Las únicas pelotas de golf fuera de la Tierra."}},
+ {cat:"moon",en:{t:"What they left to make room",m:"All Apollo missions",b:"To bring Moon rocks home without going overweight, crews abandoned cameras, boots, tools, even bags of human waste. Tons of human objects stayed behind.",h:"The Moon keeps our litter too."},
+  es:{t:"Lo que dejaron para hacer sitio",m:"Todas las misiones Apolo",b:"Para traer piedras lunares sin pasarse de peso, los astronautas abandonaron cámaras, botas, herramientas y hasta bolsas de desechos humanos. Toneladas de objetos humanos quedaron allí.",h:"La Luna guarda también nuestra basura."}},
+ {cat:"mars",en:{t:"Opportunity",m:"Rover · 2004–2018 · Meridiani Planum",b:"Built for 90 days. It lasted almost 15 years and drove 45 km. A planet-wide dust storm blocked the Sun in 2018 and it ran out of power. Last contact: 10 June 2018.",h:"“My battery is low and it’s getting dark” is a journalist’s poetic line, not a real message — but it captures the ending."},
+  es:{t:"Opportunity",m:"Rover · 2004–2018 · Meridiani Planum",b:"Lo diseñaron para durar 90 días. Duró casi 15 años y recorrió 45 km. Una tormenta de polvo global tapó el sol en 2018 y se quedó sin energía. Último contacto: 10 de junio de 2018.",h:"“Mi batería está baja y oscurece” es una frase poética de la prensa, no un mensaje real — pero resume su final."}},
+ {cat:"mars",en:{t:"Ingenuity",m:"Helicopter · 2021–2024 · Jezero",b:"The first craft to fly under its own power on another world. It made 72 flights instead of the planned 5. In January 2024 a rotor blade was damaged on landing and it was grounded. Perseverance drove on without it.",h:"It flew where nothing had flown, and there it rests."},
+  es:{t:"Ingenuity",m:"Helicóptero · 2021–2024 · Jezero",b:"El primer aparato que voló por sus propios medios en otro mundo. Hizo 72 vuelos en vez de los 5 previstos. En enero de 2024 se dañó una pala al aterrizar y quedó en tierra. Perseverance siguió sin él.",h:"Voló donde nadie había volado, y ahí descansa."}},
+ {cat:"mars",en:{t:"Spirit",m:"Rover · 2004–2010 · Gusev crater",b:"Opportunity's twin. In 2009 it got stuck in soft sand and couldn't turn its panels toward the Sun for winter. Its last message came in March 2010.",h:"Trapped in the sand, facing the wrong way from the Sun."},
+  es:{t:"Spirit",m:"Rover · 2004–2010 · cráter Gusev",b:"El gemelo de Opportunity. En 2009 se quedó atascado en arena blanda y no pudo girar sus paneles hacia el sol para el invierno. Su último mensaje llegó en marzo de 2010.",h:"Atrapado en la arena, mirando al lado equivocado del sol."}},
+ {cat:"mars",en:{t:"InSight",m:"Lander · 2018–2022 · Elysium Planitia",b:"It measured marsquakes for four years. Dust slowly buried its solar panels until it went dark. Its last photo, December 2022, shows the lander covered in dust.",h:"It signed off with a photo and a thank-you."},
+  es:{t:"InSight",m:"Módulo · 2018–2022 · Elysium Planitia",b:"Midió terremotos de Marte durante cuatro años. El polvo fue cubriendo sus paneles solares hasta apagarlo. Su última foto, en diciembre de 2022, muestra el módulo cubierto de polvo.",h:"Se despidió con una foto y un mensaje de gracias."}},
+ {cat:"mars",en:{t:"Phoenix",m:"Lander · 2008 · near the north pole",b:"It confirmed water ice just under the Martian soil. When polar winter came, cold and darkness shut it down within months.",h:"It found ice, and the ice won."},
+  es:{t:"Phoenix",m:"Módulo · 2008 · cerca del polo norte",b:"Confirmó que hay hielo de agua justo bajo el suelo marciano. Al llegar el invierno polar, el frío y la oscuridad lo apagaron a los pocos meses.",h:"Encontró agua helada y el hielo lo venció."}},
+ {cat:"mars",en:{t:"Viking 1 & 2",m:"Landers · 1976 · Chryse & Utopia",b:"The first US landers to touch down on Mars and send back pictures of the ground. They worked for years, then fell silent. The grandparents of everything that followed.",h:"The first human eyes resting on Mars."},
+  es:{t:"Viking 1 y 2",m:"Módulos · 1976 · Chryse y Utopia",b:"Los primeros módulos de EE. UU. que aterrizaron en Marte y mandaron fotos del suelo. Trabajaron años y luego callaron. Los abuelos de todo lo que vino después.",h:"Los primeros ojos humanos posados en Marte."}},
+ {cat:"mars",en:{t:"Sojourner & Pathfinder",m:"Rover + lander · 1997 · Ares Vallis",b:"Sojourner, the size of a microwave, was the first rover to roll on Mars. When contact was lost in 1997, it was circling its lander, Pathfinder, as if waiting for it.",h:"First to roll, lost beside its home."},
+  es:{t:"Sojourner y Pathfinder",m:"Rover + módulo · 1997 · Ares Vallis",b:"Sojourner, del tamaño de un microondas, fue el primer rover que rodó sobre Marte. Cuando se perdió el contacto en 1997, estaba dando vueltas alrededor de su módulo, el Pathfinder, como esperándolo.",h:"El primero en rodar, perdido junto a su casa."}},
+ {cat:"mars",en:{t:"The one still awake",m:"Perseverance · 2021– · Jezero",b:"Among all these silent machines, one still drives. Perseverance explores Jezero crater every day — here in a selfie with Ingenuity, the little helicopter it left behind. For now, it is the living memory of all the rest.",h:"Still awake, it remembers the others."},
+  es:{t:"El que sigue despierto",m:"Perseverance · 2021– · Jezero",b:"Entre todas estas máquinas en silencio, una sigue rodando. Perseverance explora el cráter Jezero cada día — aquí en una selfie con Ingenuity, el pequeño helicóptero que dejó atrás. Por ahora, es la memoria viva de todos los demás.",h:"Sigue despierto, y recuerda a los demás."}}
+];
+
+let lang="en", filter="all", editMode=false;
+const $=id=>document.getElementById(id);
+function loadOrder(){
+  try{const s=JSON.parse(localStorage.getItem("nasa-order")||"null");
+    if(Array.isArray(s)&&s.length===DATA.length) return s;}catch(e){}
+  return DATA.map((_,i)=>i);
+}
+let order=loadOrder();
+function saveOrder(){try{localStorage.setItem("nasa-order",JSON.stringify(order));}catch(e){}}
+function move(pos,dir){
+  const j=pos+dir; if(j<0||j>=order.length) return;
+  const t=order[pos]; order[pos]=order[j]; order[j]=t; saveOrder(); render();
+}
+function render(){
+  const u=UI[lang];
+  $("title").textContent=u.title; $("sub").textContent=u.sub;
+  $("note").textContent=u.note; $("foot").textContent=u.foot; $("lang").textContent=u.lang;
+  const f=$("filters");
+  f.innerHTML="";
+  if(!editMode){
+    [["all",u.all],["moon",u.moon],["mars",u.mars]].forEach(([k,label])=>{
+      const b=document.createElement("button"); b.textContent=label; b.className=filter===k?"on":"";
+      b.onclick=()=>{filter=k;render()}; f.appendChild(b);
+    });
+  }
+  const eb=document.createElement("button");
+  eb.textContent=editMode?(lang==="en"?"✓ Done":"✓ Hecho"):(lang==="en"?"⇅ Reorder":"⇅ Ordenar");
+  eb.className=editMode?"on":"";
+  eb.onclick=()=>{editMode=!editMode; if(editMode) filter="all"; render();};
+  f.appendChild(eb);
+  if(editMode){
+    const rb=document.createElement("button");
+    rb.textContent=lang==="en"?"Reset":"Restablecer";
+    rb.onclick=()=>{order=DATA.map((_,i)=>i); saveOrder(); render();};
+    f.appendChild(rb);
+  }
+  const g=$("grid"); g.innerHTML="";
+  order.forEach((i,pos)=>{
+    const o=DATA[i];
+    if(!editMode && filter!=="all" && o.cat!==filter) return;
+    const d=o[lang];
+    const c=document.createElement("div");
+    c.className="card m-"+o.cat+(editMode?" edit":"");
+    const ctrls=editMode?`<div class="ord"><button data-up="${pos}" type="button">▲</button><button data-dn="${pos}" type="button">▼</button></div>`:"";
+    c.innerHTML=`<img class="thumb" src="fotos/${i+1}.jpg" alt="" onerror="this.remove()">`+
+      `<div class="top"><span class="dot"></span><span class="meta">${d.m.split(" · ")[0]}</span></div>`+
+      `<h3>${d.t}</h3><div class="peek">${d.h}</div>`+ctrls;
+    if(!editMode) c.onclick=()=>open(i);
+    g.appendChild(c);
+  });
+  if(editMode){
+    g.querySelectorAll("[data-up]").forEach(b=>b.onclick=e=>{e.stopPropagation();move(+b.dataset.up,-1);});
+    g.querySelectorAll("[data-dn]").forEach(b=>b.onclick=e=>{e.stopPropagation();move(+b.dataset.dn,1);});
+  }
+}
+function open(i){
+  const o=DATA[i], d=o[lang];
+  $("modal").className="modal m-"+o.cat;
+  const cat=$("m-cat"); cat.className="cat "+o.cat; cat.textContent=o.cat==="moon"?(lang==="en"?"Moon":"Luna"):(lang==="en"?"Mars":"Marte");
+  $("m-title").textContent=d.t; $("m-meta").textContent=d.m; $("m-body").textContent=d.b; $("m-hook").textContent=d.h;
+  const im=$("m-img"); im.style.display="none"; im.onload=()=>im.style.display="block"; im.src="fotos/"+(i+1)+".jpg";
+  $("overlay").classList.add("open");
+}
+function close(){$("overlay").classList.remove("open")}
+$("close").onclick=close;
+$("overlay").onclick=e=>{if(e.target===$("overlay"))close()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
+$("lang").onclick=()=>{lang=lang==="en"?"es":"en";render()};
+render();
+</script>
+</body>
+</html>
