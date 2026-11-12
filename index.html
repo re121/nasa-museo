@@ -164,7 +164,7 @@ function render(){
     const c=document.createElement("div");
     c.className="card m-"+o.cat+(editMode?" edit":"");
     const ctrls=editMode?`<div class="ord"><button data-up="${pos}" type="button">▲</button><button data-dn="${pos}" type="button">▼</button></div>`:"";
-    c.innerHTML=`<img class="thumb" src="fotos/${i+1}.jpg" alt="" onerror="this.remove()">`+
+    c.innerHTML=`<img class="thumb" src="fotos/thumbs/${i+1}.jpg" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`+
       `<div class="top"><span class="dot"></span><span class="meta">${d.m.split(" · ")[0]}</span></div>`+
       `<h3>${d.t}</h3><div class="peek">${d.h}</div>`+ctrls;
     if(!editMode) c.onclick=()=>open(i);
