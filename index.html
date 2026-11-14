@@ -55,7 +55,7 @@ button.on{background:var(--gold);border-color:var(--gold);color:#140f02;font-wei
 <div class="wrap">
   <header>
     <h1 id="title">Abandoned but not Forgotten</h1>
-    <p class="sub" id="sub">Every human machine left on the Moon and Mars has a story. Touch one to hear it.</p>
+    <p class="sub" id="sub">Every human machine left on the Moon and Mars has a story. Touch one to read it.</p>
     <div class="bar" id="filters"></div>
   </header>
   <div class="grid" id="grid"></div>
@@ -77,22 +77,22 @@ button.on{background:var(--gold);border-color:var(--gold);color:#140f02;font-wei
 
 <script>
 const UI={
-  en:{title:"Abandoned but not Forgotten",sub:"Every human machine left on the Moon and Mars has a story. Touch one to hear it.",
+  en:{title:"Abandoned but not Forgotten",sub:"Every human machine left on the Moon and Mars has a story. Touch one to read it.",
     all:"All",moon:"Moon",mars:"Mars",lang:"ES",
-    note:"Honesty note: every fact here is real and checkable. The famous Opportunity line — “my battery is low and it’s getting dark” — is a journalist’s poetic version, not a real transmission. It’s marked as such. Judges reward the truth.",
+    note:"Honesty note: every fact here is real and checkable. The famous Opportunity line — “my battery is low and it’s getting dark” — is a journalist’s poetic version, not a real transmission. It’s marked as such.",
     foot:"NASA Space Apps Challenge 2026 · Challenge: Abandoned but not Forgotten · by Re1, Basel · Data & images: NASA/JPL (public domain)"},
-  es:{title:"Abandonados pero no olvidados",sub:"Cada máquina humana dejada en la Luna y Marte tiene una historia. Toca una para oírla.",
+  es:{title:"Abandonados pero no olvidados",sub:"Cada máquina humana dejada en la Luna y Marte tiene una historia. Toca una para leerla.",
     all:"Todo",moon:"Luna",mars:"Marte",lang:"EN",
-    note:"Nota de honestidad: todos los datos son reales y comprobables. La famosa frase de Opportunity — “mi batería está baja y oscurece” — es una versión poética de la prensa, no un mensaje real. Está marcada así. Al jurado le gusta la verdad.",
+    note:"Nota de honestidad: todos los datos son reales y comprobables. La famosa frase de Opportunity — “mi batería está baja y oscurece” — es una versión poética de la prensa, no un mensaje real. Está marcada así.",
     foot:"NASA Space Apps Challenge 2026 · Reto: Abandoned but not Forgotten · por Re1, Basilea · Datos e imágenes: NASA/JPL (dominio público)"}
 };
 const DATA=[
  {cat:"moon",en:{t:"The Fallen Astronaut",m:"Apollo 15 · 1971 · Mare Imbrium",b:"An 8.5 cm aluminium figure lying in the dust, beside a plaque with the names of 14 astronauts and cosmonauts who had died by then. Left by the artist Paul Van Hoeydonck through the crew.",h:"The only artwork on the Moon."},
   es:{t:"El Astronauta Caído",m:"Apolo 15 · 1971 · Mare Imbrium",b:"Una figurita de aluminio de 8,5 cm tumbada en el polvo, junto a una placa con los nombres de 14 astronautas y cosmonautas muertos hasta esa fecha. La dejó el artista Paul Van Hoeydonck a través de la tripulación.",h:"La única obra de arte en la Luna."}},
- {cat:"moon",en:{t:"Charlie Duke's family photo",m:"Apollo 16 · 1972 · Descartes",b:"Astronaut Charles Duke left a photo of his wife and two sons on the ground. On the back he wrote: “This is the family of astronaut Duke from planet Earth. Landed on the Moon, April 1972.”",h:"Still there, sun-bleached, half a century on."},
-  es:{t:"La foto de familia de Charlie Duke",m:"Apolo 16 · 1972 · Descartes",b:"El astronauta Charles Duke dejó en el suelo una foto de su mujer y sus dos hijos. Detrás escribió: “Esta es la familia del astronauta Duke, del planeta Tierra. Aterrizó en la Luna en abril de 1972.”",h:"Sigue ahí, descolorida por el sol, medio siglo después."}},
- {cat:"moon",en:{t:"The flags",m:"Apollo 11–17 · 1969–1972",b:"Six flags were planted. Apollo 11's was knocked over by the engine at liftoff; the other five still stand, confirmed by LRO orbital images. But solar radiation has almost certainly bleached them white.",h:"Still standing — but with no colour left."},
-  es:{t:"Las banderas",m:"Apolo 11–17 · 1969–1972",b:"Se plantaron 6 banderas. La del Apolo 11 la tumbó el motor al despegar; las otras 5 siguen de pie, lo confirman las fotos de la sonda LRO. Pero la radiación del sol casi seguro las ha vuelto blancas.",h:"Siguen en pie, pero ya no tienen color."}},
+ {cat:"moon",en:{t:"Charlie Duke's family photo",m:"Apollo 16 · 1972 · Descartes",b:"Astronaut Charles Duke left a photo of his wife and two sons on the ground. On the back he wrote: “This is the family of astronaut Duke from planet Earth. Landed on the Moon, April 1972.”",h:"Probably still there, faded by the Sun, half a century on."},
+  es:{t:"La foto de familia de Charlie Duke",m:"Apolo 16 · 1972 · Descartes",b:"El astronauta Charles Duke dejó en el suelo una foto de su mujer y sus dos hijos. Detrás escribió: “Esta es la familia del astronauta Duke, del planeta Tierra. Aterrizó en la Luna en abril de 1972.”",h:"Seguramente sigue ahí, descolorida por el sol, medio siglo después."}},
+ {cat:"moon",en:{t:"The flags",m:"Apollo 11–17 · 1969–1972",b:"Six flags were planted. Apollo 11's was knocked over by the engine at liftoff; orbital images from NASA's Lunar Reconnaissance Orbiter show that at least three of the others (Apollo 12, 16 and 17) are still standing, casting shadows. Decades of solar radiation have most likely bleached them white.",h:"Still standing — probably with no colour left."},
+  es:{t:"Las banderas",m:"Apolo 11–17 · 1969–1972",b:"Se plantaron 6 banderas. La del Apolo 11 la tumbó el motor al despegar; las fotos de la sonda LRO de la NASA muestran que al menos tres de las demás (Apolo 12, 16 y 17) siguen de pie, porque proyectan sombra. Tras décadas de radiación solar, lo más probable es que estén blancas.",h:"Siguen en pie, aunque probablemente ya sin color."}},
  {cat:"moon",en:{t:"The mirrors still in use",m:"Apollo 11, 14, 15 · 1969–1971",b:"Panels of mirrors (retroreflectors) left on the surface. From Earth a laser is fired at them and the echo is timed, measuring the Earth–Moon distance to the millimetre.",h:"Abandoned 50+ years ago, still working every night."},
   es:{t:"Los espejos que aún se usan",m:"Apolo 11, 14, 15 · 1969–1971",b:"Paneles de espejos (retrorreflectores) dejados en la superficie. Desde la Tierra se les dispara un láser y se mide el rebote: así se sabe la distancia Tierra–Luna al milímetro.",h:"Abandonados hace más de 50 años y todavía funcionando cada noche."}},
  {cat:"moon",en:{t:"Three Moon cars",m:"Apollo 15, 16, 17 · 1971–1972",b:"Three electric rovers (Lunar Roving Vehicles) parked exactly where the astronauts left them, ready for a trip that never came back.",h:"Three cars parked forever."},
@@ -120,9 +120,11 @@ const DATA=[
 ];
 
 let lang="en", filter="all", editMode=false;
+const EDITABLE=new URLSearchParams(location.search).has("edit");
 const $=id=>document.getElementById(id);
 const DEFAULT_ORDER=[2,11,5,4,9,1,8,7,3,14,0,10,13,12,6];
 function loadOrder(){
+  if(!EDITABLE) return DEFAULT_ORDER.slice();
   try{const s=JSON.parse(localStorage.getItem("nasa-order")||"null");
     if(Array.isArray(s)&&s.length===DATA.length) return s;}catch(e){}
   return DEFAULT_ORDER.slice();
@@ -145,6 +147,7 @@ function render(){
       b.onclick=()=>{filter=k;render()}; f.appendChild(b);
     });
   }
+  if(EDITABLE){
   const eb=document.createElement("button");
   eb.textContent=editMode?(lang==="en"?"✓ Done":"✓ Hecho"):(lang==="en"?"⇅ Reorder":"⇅ Ordenar");
   eb.className=editMode?"on":"";
@@ -155,6 +158,7 @@ function render(){
     rb.textContent=lang==="en"?"Reset":"Restablecer";
     rb.onclick=()=>{order=DEFAULT_ORDER.slice(); saveOrder(); render();};
     f.appendChild(rb);
+  }
   }
   const g=$("grid"); g.innerHTML="";
   order.forEach((i,pos)=>{
